@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type FormStep = 'channel' | 'content' | 'output';
 
@@ -41,8 +42,11 @@ const initialFormData: FormData = {
 };
 
 export default function ContentForm() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<FormStep>('channel');
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const steps: FormStep[] = ['channel', 'content', 'output'];
 
@@ -62,8 +66,32 @@ export default function ContentForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement form submission and API integration
-    console.log('Form submitted:', formData);
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate content');
+      }
+
+      const data = await response.json();
+      // Store the generated content in localStorage for now
+      localStorage.setItem('generatedContent', data.content);
+      router.push('/generated-content');
+    } catch (err) {
+      setError('Failed to generate content. Please try again.');
+      console.error('Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -289,9 +317,10 @@ export default function ContentForm() {
           {currentStep === 'output' ? (
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              disabled={isLoading}
+              className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Generate Content
+              {isLoading ? 'Generating...' : 'Generate Content'}
             </button>
           ) : (
             <button
@@ -303,6 +332,11 @@ export default function ContentForm() {
             </button>
           )}
         </div>
+        {error && (
+          <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
       </form>
     </div>
   );
