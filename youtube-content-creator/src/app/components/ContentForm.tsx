@@ -1,9 +1,20 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
-type FormStep = 'channel' | 'content' | 'output';
+type FormStep = "channel" | "content" | "output";
 
 interface FormData {
   channel: {
@@ -25,30 +36,30 @@ interface FormData {
 
 const initialFormData: FormData = {
   channel: {
-    name: '',
-    description: '',
-    category: '',
+    name: "",
+    description: "",
+    category: "",
   },
   content: {
-    style: '',
-    tone: '',
-    targetAudience: '',
+    style: "",
+    tone: "",
+    targetAudience: "",
   },
   output: {
-    videoLength: '',
-    format: '',
-    frequency: '',
+    videoLength: "",
+    format: "",
+    frequency: "",
   },
 };
 
 export default function ContentForm() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState<FormStep>('channel');
+  const [currentStep, setCurrentStep] = useState<FormStep>("channel");
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const steps: FormStep[] = ['channel', 'content', 'output'];
+  const steps: FormStep[] = ["channel", "content", "output"];
 
   const handleNext = () => {
     const currentIndex = steps.indexOf(currentStep);
@@ -67,28 +78,28 @@ export default function ContentForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
+      const response = await fetch("/api/generate", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate content');
+        throw new Error("Failed to generate content");
       }
 
       const data = await response.json();
       // Store the generated content in localStorage for now
-      localStorage.setItem('generatedContent', data.content);
-      router.push('/generated-content');
+      localStorage.setItem("generatedContent", data.content);
+      router.push("/generated-content");
     } catch (err) {
-      setError('Failed to generate content. Please try again.');
-      console.error('Error:', err);
+      setError("Failed to generate content. Please try again.");
+      console.error("Error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +112,11 @@ export default function ContentForm() {
           {steps.map((step) => (
             <div
               key={step}
-              className={`flex-1 text-center ${currentStep === step ? 'text-blue-600 font-bold' : 'text-gray-400'}`}
+              className={`flex-1 text-center ${
+                currentStep === step
+                  ? "text-blue-600 font-bold"
+                  : "text-gray-400"
+              }`}
             >
               {step.charAt(0).toUpperCase() + step.slice(1)}
             </div>
@@ -111,7 +126,9 @@ export default function ContentForm() {
           {steps.map((step, index) => (
             <div key={step} className="flex-1 relative">
               <div
-                className={`h-2 ${currentStep === step ? 'bg-blue-600' : 'bg-gray-200'}`}
+                className={`h-2 ${
+                  currentStep === step ? "bg-blue-600" : "bg-gray-200"
+                }`}
               />
               {index < steps.length - 1 && (
                 <div className="absolute right-0 top-0 h-2 w-2 bg-gray-200 rounded-full" />
@@ -122,214 +139,272 @@ export default function ContentForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {currentStep === 'channel' && (
+        {currentStep === "channel" && (
           <div className="space-y-4">
             <div>
-              <label htmlFor="channelName" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="channelName"
+                className="block text-sm font-medium mb-2"
+              >
                 Channel Name
               </label>
-              <input
+              <Input
                 type="text"
                 id="channelName"
                 value={formData.channel.name}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  channel: { ...formData.channel, name: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    channel: { ...formData.channel, name: e.target.value },
+                  })
+                }
                 placeholder="Enter your channel name"
               />
             </div>
             <div>
-              <label htmlFor="channelDescription" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="channelDescription"
+                className="block text-sm font-medium mb-2"
+              >
                 Channel Description
               </label>
-              <textarea
+              <Textarea
                 id="channelDescription"
                 value={formData.channel.description}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  channel: { ...formData.channel, description: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    channel: {
+                      ...formData.channel,
+                      description: e.target.value,
+                    },
+                  })
+                }
+                className="h-32"
                 placeholder="Describe your channel's purpose and content"
               />
             </div>
             <div>
-              <label htmlFor="channelCategory" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="channelCategory"
+                className="block text-sm font-medium mb-2"
+              >
                 Channel Category
               </label>
-              <select
-                id="channelCategory"
+              <Select
                 value={formData.channel.category}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  channel: { ...formData.channel, category: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    channel: { ...formData.channel, category: value },
+                  })
+                }
               >
-                <option value="">Select a category</option>
-                <option value="education">Education</option>
-                <option value="entertainment">Entertainment</option>
-                <option value="gaming">Gaming</option>
-                <option value="music">Music</option>
-                <option value="tech">Technology</option>
-                <option value="vlog">Vlog</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="education">Education</SelectItem>
+                  <SelectItem value="entertainment">Entertainment</SelectItem>
+                  <SelectItem value="gaming">Gaming</SelectItem>
+                  <SelectItem value="music">Music</SelectItem>
+                  <SelectItem value="tech">Technology</SelectItem>
+                  <SelectItem value="vlog">Vlog</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         )}
 
-        {currentStep === 'content' && (
+        {currentStep === "content" && (
           <div className="space-y-4">
             <div>
-              <label htmlFor="contentStyle" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="contentStyle"
+                className="block text-sm font-medium mb-2"
+              >
                 Content Style
               </label>
-              <select
-                id="contentStyle"
+              <Select
                 value={formData.content.style}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  content: { ...formData.content, style: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    content: { ...formData.content, style: value },
+                  })
+                }
               >
-                <option value="">Select a style</option>
-                <option value="tutorial">Tutorial</option>
-                <option value="review">Review</option>
-                <option value="commentary">Commentary</option>
-                <option value="storytelling">Storytelling</option>
-                <option value="interview">Interview</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a style" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tutorial">Tutorial</SelectItem>
+                  <SelectItem value="review">Review</SelectItem>
+                  <SelectItem value="commentary">Commentary</SelectItem>
+                  <SelectItem value="storytelling">Storytelling</SelectItem>
+                  <SelectItem value="interview">Interview</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <label htmlFor="contentTone" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="contentTone"
+                className="block text-sm font-medium mb-2"
+              >
                 Content Tone
               </label>
-              <select
-                id="contentTone"
+              <Select
                 value={formData.content.tone}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  content: { ...formData.content, tone: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    content: { ...formData.content, tone: value },
+                  })
+                }
               >
-                <option value="">Select a tone</option>
-                <option value="professional">Professional</option>
-                <option value="casual">Casual</option>
-                <option value="humorous">Humorous</option>
-                <option value="educational">Educational</option>
-                <option value="inspirational">Inspirational</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a tone" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="casual">Casual</SelectItem>
+                  <SelectItem value="humorous">Humorous</SelectItem>
+                  <SelectItem value="educational">Educational</SelectItem>
+                  <SelectItem value="inspirational">Inspirational</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <label htmlFor="targetAudience" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="targetAudience"
+                className="block text-sm font-medium mb-2"
+              >
                 Target Audience
               </label>
-              <input
+              <Input
                 type="text"
                 id="targetAudience"
                 value={formData.content.targetAudience}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  content: { ...formData.content, targetAudience: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    content: {
+                      ...formData.content,
+                      targetAudience: e.target.value,
+                    },
+                  })
+                }
                 placeholder="Describe your target audience"
               />
             </div>
           </div>
         )}
 
-        {currentStep === 'output' && (
+        {currentStep === "output" && (
           <div className="space-y-4">
             <div>
-              <label htmlFor="videoLength" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="videoLength"
+                className="block text-sm font-medium mb-2"
+              >
                 Video Length
               </label>
-              <select
-                id="videoLength"
+              <Select
                 value={formData.output.videoLength}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  output: { ...formData.output, videoLength: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    output: { ...formData.output, videoLength: value },
+                  })
+                }
               >
-                <option value="">Select video length</option>
-                <option value="short">Short (< 5 minutes)</option>
-                <option value="medium">Medium (5-15 minutes)</option>
-                <option value="long">Long (> 15 minutes)</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select video length" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="short">Short (&lt; 5 minutes)</SelectItem>
+                  <SelectItem value="medium">Medium (5-15 minutes)</SelectItem>
+                  <SelectItem value="long">Long (&gt; 15 minutes)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <label htmlFor="format" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="format"
+                className="block text-sm font-medium mb-2"
+              >
                 Content Format
               </label>
-              <select
-                id="format"
+              <Select
                 value={formData.output.format}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  output: { ...formData.output, format: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    output: { ...formData.output, format: value },
+                  })
+                }
               >
-                <option value="">Select format</option>
-                <option value="script">Full Script</option>
-                <option value="outline">Detailed Outline</option>
-                <option value="talking-points">Talking Points</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select format" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="script">Full Script</SelectItem>
+                  <SelectItem value="outline">Detailed Outline</SelectItem>
+                  <SelectItem value="talking-points">Talking Points</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <label htmlFor="frequency" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="frequency"
+                className="block text-sm font-medium mb-2"
+              >
                 Upload Frequency
               </label>
-              <select
-                id="frequency"
+              <Select
                 value={formData.output.frequency}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  output: { ...formData.output, frequency: e.target.value }
-                })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    output: { ...formData.output, frequency: value },
+                  })
+                }
               >
-                <option value="">Select frequency</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="biweekly">Bi-weekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         )}
 
         <div className="flex justify-between mt-8">
-          <button
+          <Button
             type="button"
             onClick={handlePrevious}
-            className={`px-4 py-2 bg-gray-200 text-gray-700 rounded-lg ${currentStep === 'channel' ? 'invisible' : ''}`}
+            variant="outline"
+            className={`${currentStep === "channel" ? "invisible" : ""}`}
           >
             Previous
-          </button>
-          {currentStep === 'output' ? (
-            <button
+          </Button>
+          {currentStep === "output" ? (
+            <Button
               type="submit"
               disabled={isLoading}
-              className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={isLoading ? "opacity-50 cursor-not-allowed" : ""}
             >
-              {isLoading ? 'Generating...' : 'Generate Content'}
-            </button>
+              {isLoading ? "Generating..." : "Generate Content"}
+            </Button>
           ) : (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
+            <Button type="button" onClick={handleNext}>
               Next
-            </button>
+            </Button>
           )}
         </div>
         {error && (
