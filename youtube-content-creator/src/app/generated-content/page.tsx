@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface GeneratedContent {
   title: string;
@@ -71,9 +73,16 @@ export default function GeneratedContentPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Loading...</h2>
-          </div>
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle>Generating Your Content...</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -81,55 +90,72 @@ export default function GeneratedContentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white shadow sm:rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">{parsedContent.title}</h1>
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl">{parsedContent.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Video Description</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground whitespace-pre-line">{parsedContent.description}</p>
+                </CardContent>
+              </Card>
 
-            <div className="space-y-8">
-              <section>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Video Description</h2>
-                <p className="text-gray-600 whitespace-pre-line">{parsedContent.description}</p>
-              </section>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Content Outline</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose max-w-none text-muted-foreground whitespace-pre-line">
+                    {parsedContent.outline}
+                  </div>
+                </CardContent>
+              </Card>
 
-              <section>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Content Outline</h2>
-                <div className="prose max-w-none text-gray-600 whitespace-pre-line">
-                  {parsedContent.outline}
-                </div>
-              </section>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Key Talking Points</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-5 space-y-2">
+                    {parsedContent.talkingPoints.map((point, index) => (
+                      <li key={index} className="text-muted-foreground">{point}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
 
-              <section>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Talking Points</h2>
-                <ul className="list-disc pl-5 space-y-2">
-                  {parsedContent.talkingPoints.map((point, index) => (
-                    <li key={index} className="text-gray-600">{point}</li>
-                  ))}
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Suggested Tags</h2>
-                <div className="flex flex-wrap gap-2">
-                  {parsedContent.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </section>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Suggested Tags</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {parsedContent.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            <div className="mt-8">
-              <button
+            <div className="mt-8 flex justify-end">
+              <Button
                 onClick={handleBack}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                variant="default"
               >
                 Back to Form
-              </button>
+              </Button>
             </div>
           </div>
         </div>
